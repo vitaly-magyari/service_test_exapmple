@@ -1,0 +1,25 @@
+{
+  "valid_sep_semi": {
+    "separator": ";",
+    "input": "3;4;5"
+  },
+  "valid_no_sep": {
+    "input": "3;4;5"
+  },
+  "valid_sep_comma": {
+    "input": "3,4,5",
+    "separator": ","
+  },
+  "invalid_zero_sides" : {
+    "separator": ";",
+    "input": "0;0;0"
+  },
+  "valid_floating_point_no_sep": {
+    "input": "1.5;1.5;1.5"
+  },
+
+  "valid_letter_separator": {
+    "separator": "a",
+    "input": "3a4a5"
+  }
+}
