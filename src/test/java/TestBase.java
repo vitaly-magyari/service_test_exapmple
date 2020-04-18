@@ -1,3 +1,5 @@
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import test_data.RequestBodies;
@@ -11,6 +13,7 @@ public class TestBase {
     protected ApiLibrary api = new ApiLibrary();
     protected DataUtil util = new DataUtil();
     protected RequestBodies requestBodies = RequestBodies.get();
+
 
     @BeforeAll
     protected static void setUp() {

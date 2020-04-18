@@ -1,5 +1,7 @@
 import entities.Triangle;
 import io.restassured.response.Response;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -16,6 +18,8 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class APITests extends TestBase {
+
+    protected static final Logger logger = LogManager.getLogger();
 
     @Tag("disabled")
     @Test
@@ -44,6 +48,8 @@ public class APITests extends TestBase {
     @ParameterizedTest(name = "{0}")
     void createTriangleTest(String caseName, double[] sides, String sep) {
         String requestBody = util.generateRequestBody(sides[0], sides[1], sides[2], sep);
+        logger.warn(requestBody);
+
         var createdTriResponse = api.createTriangle(requestBody);
         createdTriResponse
                 .then()
