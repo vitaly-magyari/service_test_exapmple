@@ -170,7 +170,8 @@ public class APITests extends TestBase {
     */
     @Tag("api")
     @Tag("defect")
-    @ParameterizedTest
+    @DisplayName("Separator tests")
+    @ParameterizedTest(name = "Test separator \"{0}\"")
     @ValueSource(strings = {
             "}", "!", "%", "@", "#", "$", "%", "^", "&", "*", "(", ")", "{",
             "[", "]", "+", "-", "_", "=", "/", "\\", "\n", "\r", "\t", ".",
@@ -188,26 +189,54 @@ public class APITests extends TestBase {
                 .then().statusCode(200);
     }
 
-    @Tag("api")
-    @Test
-    void testPerimeter() {
-        assertTrue(false, "not implemented");
+    private static Stream<Arguments> areaTest() {
+        return TestDataProvider.areaSource();
     }
 
     @Tag("api")
-    @Test
-    void testArea() {
-        assertTrue(false, "not implemented");
+    @MethodSource
+    @ParameterizedTest(name = "Test area of {0} is {1}")
+    void areaTest(Triangle triangle, double expectedArea) {
+        String id = api.createTriangle(util.generateRequestBody(triangle, ";"))
+                .then().assertThat().statusCode(200)
+                .extract().path("id");
+
+        api.getArea(id)
+                .then()
+                .log().status()
+                .log().body()
+                .assertThat().statusCode(200)
+                .assertThat().body("result", equalTo(expectedArea));
+    }
+
+    private static Stream<Arguments> perimeterTest() {
+        return TestDataProvider.perimeterSource();
+    }
+
+    @Tag("api")
+    @MethodSource
+    @ParameterizedTest(name = "Test perimeter of {0} is {1}")
+    void perimeterTest(Triangle triangle, double expectedPerimeter) {
+        String id = api.createTriangle(util.generateRequestBody(triangle, ";"))
+                .then().assertThat().statusCode(200)
+                .extract().path("id");
+
+        api.getPerimeter(id)
+                .then()
+                .log().status()
+                .log().body()
+                .assertThat().statusCode(200)
+                .assertThat().body("result", equalTo(expectedPerimeter));
     }
 
     @Tag("api")
     @Tag("defect")
-    @ParameterizedTest
+    @ParameterizedTest(name = "Invalid sides combinations: {arguments}")
     @DisplayName("Zero length sides, negative sides, sides equal or greater than sum of other two")
     @CsvSource({
             "0,1,1", "1,0,1", "1,1,0", // zero-length sides are accepted
             "-3,4,5", "4,-5,6", "5,6,-7", // negative sides are accepted
-            "1,1,2", "1,1,3" // equal creates zero-area triangle, greater correctly results in error
+            "1,1,2", "1,1,3" // Triangle inequality: equal creates zero-area triangle, greater than correctly results in error
     })
     void invalidSidesCombinationTests(double side1, double side2, double side3) {
         String reqBody = util.generateRequestBody(side1, side2, side3, ";");
@@ -219,6 +248,21 @@ public class APITests extends TestBase {
                 .assertThat().body("error", containsString("Unprocessable Entity"))
                 .assertThat().body("message", containsString("Cannot process input"))
                 .assertThat().body("exception", containsString("UnprocessableDataException"));
+    }
+
+    private static Stream<Arguments> cornerCasesPostTest() {
+        return TestDataProvider.cornerCases();
+    }
+
+    @Tag("api")
+    @ParameterizedTest(name = "{0}")
+    @MethodSource
+    void cornerCasesPostTest(String caseName,String requestBody, int statusCode) {
+        api.createTriangle(requestBody)
+                .then()
+                .log().status()
+                .log().body()
+                .assertThat().statusCode(statusCode);
     }
 
     boolean allTrianglesContainsId(String idToFind, List<String> triangleList) {

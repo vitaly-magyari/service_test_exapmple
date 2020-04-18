@@ -12,9 +12,8 @@ public class Config {
     }
 
     public static String getBaseURI() {
-        return getProps().getProperty("baseURI");
+        return getProps().getProperty("baseURI","http://localhost:8080");
     }
-
     public static String getToken() {
         return getProps().getProperty("token");
     }

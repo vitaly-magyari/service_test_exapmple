@@ -17,8 +17,8 @@ repositories {
 
 test {
     useJUnitPlatform {
-        includeTags 'api', 'debug'
-        excludeTags 'disabled', 'defect'
+        includeTags 'unit', 'api', 'debug', 'defect'
+        excludeTags 'disabled'
     }
 
     testLogging {

@@ -15,11 +15,17 @@ import static io.restassured.path.json.config.JsonPathConfig.NumberReturnType.DO
 public class ApiLibrary {
     Logger logger = LogManager.getLogger();
 
-    protected RequestSpecification baseRequest() {
+    private RequestSpecification baseRequest() {
         return given()
                 .config(config().jsonConfig(jsonConfig().numberReturnType(DOUBLE)))
                 .header("X-User", Config.getToken())
                 .header("Content-Type", "application/json");
+    }
+
+    private RequestSpecification baseTriangle(String id) {
+        return baseRequest()
+                .log().method()
+                .pathParam("id", id);
     }
 
     public Response createTriangle(String requestBody) {
@@ -33,17 +39,25 @@ public class ApiLibrary {
 
     public Response getTriangle(String id) {
         logger.info("getTriangle " + id);
-        return baseRequest()
-                .log().method()
-                .pathParam("id", id)
+        return baseTriangle(id)
                 .get("/triangle/{id}");
     }
 
+    public Response getArea(String id) {
+        logger.info("getArea " + id);
+        return baseTriangle(id)
+                .get("/triangle/{id}/area");
+    }
+
+    public Response getPerimeter(String id) {
+        logger.info("getPerimeter " + id);
+        return baseTriangle(id)
+                .get("/triangle/{id}/perimeter");
+    }
+
     public Response deleteTriangle(String id) {
-        logger.info("deleteTriangle "+ id);
-        return baseRequest()
-                .log().method()
-                .pathParam("id", id)
+        logger.info("deleteTriangle " + id);
+        return baseTriangle(id)
                 .delete("/triangle/{id}");
     }
 
