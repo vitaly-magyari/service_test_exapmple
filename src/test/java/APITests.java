@@ -5,7 +5,9 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import test_data.TestDataProvider;
 
 import java.util.HashSet;
@@ -160,6 +162,63 @@ public class APITests extends TestBase {
                 .map(tri -> tri.id)
                 .collect(Collectors.toSet());
         assertThat(createdIds, equalTo(receivedIds));
+    }
+
+    /*
+    some separators behave unexpectedly, those that are parts of regex patterns may cause 500 error
+    zero-length separator expectedly doesn't work on multi-digit sides, but works for single digit
+    */
+    @Tag("api")
+    @Tag("defect")
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "}", "!", "%", "@", "#", "$", "%", "^", "&", "*", "(", ")", "{",
+            "[", "]", "+", "-", "_", "=", "/", "\\", "\n", "\r", "\t", ".",
+            ",", "<", ">", "~", "`", "\"", "\'", "", "ab"
+    })
+    void separatorTest(String sep) {
+        String reqBody = util.generateRequestBody(10.1, 10.01, 10.001, sep);
+        String id = api.createTriangle(reqBody)
+                .then()
+                .log().body()
+                .assertThat().statusCode(200)
+                .extract().path("id");
+
+        api.deleteTriangle(id)
+                .then().statusCode(200);
+    }
+
+    @Tag("api")
+    @Test
+    void testPerimeter() {
+        assertTrue(false, "not implemented");
+    }
+
+    @Tag("api")
+    @Test
+    void testArea() {
+        assertTrue(false, "not implemented");
+    }
+
+    @Tag("api")
+    @Tag("defect")
+    @ParameterizedTest
+    @DisplayName("Zero length sides, negative sides, sides equal or greater than sum of other two")
+    @CsvSource({
+            "0,1,1", "1,0,1", "1,1,0", // zero-length sides are accepted
+            "-3,4,5", "4,-5,6", "5,6,-7", // negative sides are accepted
+            "1,1,2", "1,1,3" // equal creates zero-area triangle, greater correctly results in error
+    })
+    void invalidSidesCombinationTests(double side1, double side2, double side3) {
+        String reqBody = util.generateRequestBody(side1, side2, side3, ";");
+
+        api.createTriangle(reqBody)
+                .then()
+                .log().all()
+                .assertThat().statusCode(422)
+                .assertThat().body("error", containsString("Unprocessable Entity"))
+                .assertThat().body("message", containsString("Cannot process input"))
+                .assertThat().body("exception", containsString("UnprocessableDataException"));
     }
 
     boolean allTrianglesContainsId(String idToFind, List<String> triangleList) {

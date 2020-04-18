@@ -10,10 +10,8 @@ public class TestBase {
     protected ApiLibrary api = new ApiLibrary();
     protected DataUtil util = new DataUtil();
 
-
     @BeforeAll
     protected static void setUp() {
-
         baseURI = Config.getBaseURI();
     }
 

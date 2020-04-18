@@ -5,6 +5,9 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public class Config {
+
+    private static final String CONFIG_FILE = "config.properties";
+
     private Config() {
     }
 
@@ -22,7 +25,7 @@ public class Config {
     private static Properties getProps() {
         if (_props == null) {
             _props = new Properties();
-            try (InputStream propInput = Config.class.getClassLoader().getResourceAsStream("config.properties")) {
+            try (InputStream propInput = Config.class.getClassLoader().getResourceAsStream(CONFIG_FILE)) {
                 _props.load(propInput);
             } catch (IOException | NullPointerException e) {
                 throw new RuntimeException("config.properties file not found in classpath", e);
