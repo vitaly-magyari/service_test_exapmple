@@ -3,8 +3,6 @@ package util;
 import com.google.gson.Gson;
 import entities.Triangle;
 import io.restassured.response.Response;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
@@ -12,22 +10,8 @@ import java.util.List;
 import java.util.Objects;
 
 public class DataUtil {
-    private Logger logger = LogManager.getLogger();
 
-    private static final String INPUT_FORMAT_DOUBLE = "%1$f" + "%4$s" + "%2$f" + "%4$s" + "%3$f";
-    private static final String INPUT_FORMAT_ROUND_TO_INT = "%1$.0f" + "%4$s" + "%2$.0f" + "%4$s" + "%3$.0f";
     Gson gson = new Gson();
-
-    public Triangle extractTriangle(Response triangleResponse) {
-        return triangleResponse
-                .then()
-                .assertThat()
-                .statusCode(200)
-                .extract()
-                .body()
-                .jsonPath()
-                .getObject(".", Triangle.class);
-    }
 
     public List<Triangle> extractAllTriangles(Response triangleListResponse) {
         return triangleListResponse

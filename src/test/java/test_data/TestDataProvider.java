@@ -14,13 +14,17 @@ public class TestDataProvider {
 //                Arguments.of("Valid sides, separator ','", new double[]{3, 4, 5}, null),
 //                Arguments.of("Valid sides floating point sides, no sep", new double[]{1.5, 1.55, 2.005}, null),
 //                Arguments.of("Valid, sequence of letters as separator", new double[]{5,6,7}, "ab"),
-//                Arguments.of("Valid, bigger numbers", new double[]{100.001,100.0001,100.000001}, null),
-                Arguments.of("Valid, bigger numbers", new double[]{1000,1000,1000.00001}, null)
-//                Arguments.of(
-//                        "Valid sides, letter separator",
-//                        bodies.valid_letter_separator.asJson(),
-//                        200,
-//                        new Triangle(3,4,5))
+                Arguments.of("Single digit valid sides, zero-length sep", new double[]{4, 5, 6}, ""),
+                Arguments.of("Valid sides, non-alf", new double[]{4, 5, 6}, "")
+        );
+    }
+
+    public static Stream<Arguments> roundingBorder() {
+        return Stream.of(
+                Arguments.of("Last valid comparison",
+                        10.000000000000005, 10.000000000000005),
+                Arguments.of("Adjacent numbers are no longer distinct for comparison",
+                        10.000000000000004, 10.000000000000003)
         );
     }
 }
