@@ -28,49 +28,45 @@ public class APITests extends TestBase {
     void readJson() {
         var bodies = RequestBodies.get();
         assertEquals("{\"separator\":\";\",\"input\":\"3;4;5\"}", util.generateRequestBody(3, 4, 5, ";"));
-//        assertEquals("{\"separator\":\";\",\"input\":\"3;4;5\"}",bodies.valid_sep_semi.asJson());
-//        assertEquals("{\"input\":\"3;4;5\"}", bodies.valid_no_sep.asJson());
     }
 
 
-    // using wrapper to avoid call of method by string literal in @MethodSource
+    /**
+     * using wrapper to avoid call of method by string literal in @MethodSource
+     */
     private static Stream<Arguments> createTriangleTest() {
         return TestDataProvider.createTriangle();
     }
 
     @Tag("api")
-    @ParameterizedTest(name = "{0}")
+    @DisplayName("Create triangle by request, get triangle back, check sides equality")
     @MethodSource
+    @ParameterizedTest(name = "{0}")
     void createTriangleTest(String caseName, double[] sides, String sep) {
         String requestBody = util.generateRequestBody(sides[0], sides[1], sides[2], sep);
         var createdTriResponse = api.createTriangle(requestBody);
-
         createdTriResponse
                 .then()
                 .assertThat()
                 .statusCode(200);
-
         String id = createdTriResponse.path("id");
-        float firstSide = createdTriResponse.path("firstSide");
-        float secondSide = createdTriResponse.path("secondSide");
-        float thirdSide = createdTriResponse.path("thirdSide");
 
-        assertEquals(sides[0], firstSide);
-        assertEquals(sides[1], secondSide);
-        assertEquals(sides[2], thirdSide);
+        Triangle createdTriangle = util.extractTriangle(createdTriResponse);
+        Triangle expectedTriangle = new Triangle(sides[0], sides[1], sides[2]);
+        assertEquals(expectedTriangle, createdTriangle, "created triangle sides don't match");
 
         Response existingTriResponse = api.getTriangle(id);
-        Triangle existingTri = util.extractTriangle(existingTriResponse);
-
-        existingTriResponse.then().body("id", equalTo(id));
-
-//        assertTrue(existingTriResponse.path("path").toString().contains(id), "Id is not contained in path");
-//        assertEquals(createdTri, existingTri);
+        existingTriResponse
+                .then()
+                .statusCode(200)
+                .body("id", equalTo(id));
+        Triangle existingTriangle = util.extractTriangle(existingTriResponse);
+        assertEquals(createdTriangle, existingTriangle);
     }
 
 
     @Test
-    @DisplayName("Create and delete triangle, check get by id returns 404, check absence in all triangles")
+    @DisplayName("Create and delete triangle, check get by id returns 404, check absence in all triangles response")
     @Tag("api")
     void deleteTriangleTest() {
         String createdId = api.createTriangle(requestBodies.valid_sep_semi.asJson())
@@ -89,16 +85,16 @@ public class APITests extends TestBase {
                 .body("error", equalTo("Not Found"))
                 .body("message", equalTo("Not Found"));
 
-        List<Triangle> allTriangles = util.extractAllTriangles(api.getAllTriangles());
+        List<String> allTriangleIds = util.extractAllTrianglesIds(api.getAllTriangles());
 
         assertFalse(
-                allTrianglesContainsId(createdId, allTriangles),
+                allTrianglesContainsId(createdId, allTriangleIds),
                 String.format("deleted triangle %s still present in all triangles response", createdId));
     }
 
-    boolean allTrianglesContainsId(String deletedId, List<Triangle> triangleList) {
-        for (Triangle tri : triangleList) {
-            if (tri.id.equals(deletedId)) {
+    boolean allTrianglesContainsId(String deletedId, List<String> triangleList) {
+        for (String id : triangleList) {
+            if (id.equals(deletedId)) {
                 return true;
             }
         }

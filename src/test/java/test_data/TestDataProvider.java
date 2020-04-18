@@ -10,26 +10,11 @@ public class TestDataProvider {
 
     public static Stream<Arguments> createTriangle() {
         return Stream.of(
-                Arguments.of("Valid sides, separator ';'", new double[] {3,4,5}, ";")
-
-//                Arguments.of(
-//                        "Valid sides, separator ','",
-//                        bodies.valid_sep_comma.asJson(),
-//                        200,
-//                        new Triangle(3,4,5)),
-//
-//                Arguments.of(
-//                        "Valid sides, no separator provided",
-//                        bodies.valid_no_sep.asJson(),
-//                        200,
-//                        new Triangle(3,4,5)),
-//
-//                Arguments.of(
-//                        "Valid sides floating point sides, no sep",
-//                        bodies.valid_floating_point_no_sep.asJson(),
-//                        200,
-//                        new Triangle(1.5,1.5,1.5)),
-//
+//                Arguments.of("Valid sides, separator ';'", new double[]{3, 4, 5}, ";"),
+//                Arguments.of("Valid sides, separator ','", new double[]{3, 4, 5}, ","),
+//                Arguments.of("Valid sides, separator ','", new double[]{3, 4, 5}, null),
+//                Arguments.of("Valid sides floating point sides, no sep", new double[]{1.5, 1.55, 2.005}, null),
+                Arguments.of("Valid, sequence of letters as separator", new double[]{5,6,7}, "ab")
 //                Arguments.of(
 //                        "Valid sides, letter separator",
 //                        bodies.valid_letter_separator.asJson(),

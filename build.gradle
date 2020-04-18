@@ -3,13 +3,10 @@ plugins {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_13
-    targetCompatibility = JavaVersion.VERSION_13
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }
 
-tasks.withType(JavaCompile) {
-    options.compilerArgs += "--enable-preview"
-}
 
 group 'org.example'
 version '1.0-SNAPSHOT'
@@ -23,7 +20,6 @@ test {
         includeTags 'api', 'debug'
         excludeTags 'disabled'
     }
-    jvmArgs += '--enable-preview'
 
     testLogging {
         events "passed", "skipped", "failed", "standardOut", "standardError"
@@ -36,7 +32,9 @@ dependencies {
             'org.junit.jupiter:junit-jupiter-params:5.6.2',
             'io.rest-assured:rest-assured:4.3.0',
             'io.rest-assured:json-path:4.3.0',
-            'com.google.code.gson:gson:2.8.6'
+            'com.google.code.gson:gson:2.8.6',
+            'org.apache.logging.log4j:log4j-api:2.13.1',
+            'org.apache.logging.log4j:log4j-coren:2.13.1'
     )
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.2'
 }

@@ -1,8 +1,9 @@
 package util;
 
-import entities.Triangle;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+
+import java.util.List;
 
 import static io.restassured.RestAssured.given;
 
@@ -38,10 +39,12 @@ public class ApiLibrary {
     }
 
     public void deleteAllTriangles() {
-        DataUtil responseUtil = new DataUtil();
-        for (Triangle tri : responseUtil.extractAllTriangles(getAllTriangles())) {
-            deleteTriangle(tri.id);
+        var util = new DataUtil();
+        List<String> ids = util.extractAllTrianglesIds(getAllTriangles());
+        for (String id : ids) {
+            deleteTriangle(id);
         }
     }
+
 
 }
