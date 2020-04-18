@@ -12,7 +12,6 @@ import static io.restassured.RestAssured.baseURI;
 public class TestBase {
     protected ApiLibrary api = new ApiLibrary();
     protected DataUtil util = new DataUtil();
-    protected RequestBodies requestBodies = RequestBodies.get();
 
 
     @BeforeAll

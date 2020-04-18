@@ -8,13 +8,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import test_data.RequestBodies;
 import test_data.TestDataProvider;
 
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class APITests extends TestBase {
@@ -29,9 +29,7 @@ public class APITests extends TestBase {
 
     @Test
     @Tag("debug")
-    void readJson() {
-        var bodies = RequestBodies.get();
-        assertEquals("{\"separator\":\";\",\"input\":\"3;4;5\"}", util.generateRequestBody(3, 4, 5, ";"));
+    void debug() {
     }
 
 
@@ -75,7 +73,7 @@ public class APITests extends TestBase {
     @DisplayName("Create and delete triangle, check get by id returns 404, check absence in all triangles response")
     @Tag("api")
     void deleteTriangleTest() {
-        String createdId = api.createTriangle(requestBodies.valid_sep_semi.asJson())
+        String createdId = api.createTriangle(util.generateRequestBody(3, 4, 5, ";"))
                 .then().assertThat()
                 .statusCode(200)
                 .extract()
@@ -96,6 +94,33 @@ public class APITests extends TestBase {
         assertFalse(
                 allTrianglesContainsId(createdId, allTriangleIds),
                 String.format("deleted triangle %s still present in all triangles response", createdId));
+    }
+
+
+    static Stream<Arguments> roundingBorderTest() {
+        return Stream.of(
+                Arguments.of(10.000001f, 10.000001),
+                Arguments.of(10f, 10.0000001)
+        );
+    }
+
+    @Tag("api")
+    @ParameterizedTest
+    @MethodSource
+    void roundingBorderTest(float expectedValue, double inputValue) {
+        String requestBody = util.generateRequestBody(inputValue, inputValue, inputValue, null);
+        logger.warn(requestBody);
+
+        String responseBody = api.createTriangle(requestBody)
+                .then().assertThat()
+                .statusCode(200)
+                .assertThat()
+                .body("firstSide", is(expectedValue))
+                .body("secondSide", is(expectedValue))
+                .body("thirdSide", is(expectedValue))
+                .extract()
+                .body().asString();
+        logger.warn(responseBody);
     }
 
     boolean allTrianglesContainsId(String deletedId, List<String> triangleList) {
