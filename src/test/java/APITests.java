@@ -22,18 +22,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class APITests extends TestBase {
 
-    @Tag("disabled")
-    @Test
-    void testStub() {
-        assertTrue(false);
-    }
-
-    @Test
-    @Tag("debug")
-    void debug() {
-    }
-
-
     // using wrapper to avoid call of method by string literal in @MethodSource
     private static Stream<Arguments> createTriangleTest() {
         return TestDataProvider.createTriangle();
@@ -75,8 +63,7 @@ public class APITests extends TestBase {
     @Test
     @DisplayName("Create and delete triangle, check get by id returns 404, check absence in all triangles response")
     @Tag("api")
-    @Tag("defect")
-        // I expect a non-empty response after deletion
+    @Tag("blocked")
     void deleteTriangleTest() {
         String createdId = api.createTriangle(util.generateRequestBody(3, 4, 5, ";"))
                 .then()
@@ -105,7 +92,6 @@ public class APITests extends TestBase {
                 String.format("deleted triangle %s still present in all triangles response", createdId));
     }
 
-    // using wrapper to avoid call of method by string literal in @MethodSource
     public static Stream<Arguments> roundingBorderTest() {
         return TestDataProvider.roundingBorder();
     }
@@ -154,7 +140,7 @@ public class APITests extends TestBase {
 
         assertThat(created, equalTo(received));
 
-        // as ids are exempt from Triangle equality
+        // as ids are exempt from Triangle equality, verify them separately
         Set<String> createdIds = created.stream()
                 .map(tri -> tri.id)
                 .collect(Collectors.toSet());
@@ -164,18 +150,14 @@ public class APITests extends TestBase {
         assertThat(createdIds, equalTo(receivedIds));
     }
 
-    /*
-    some separators behave unexpectedly, those that are parts of regex patterns may cause 500 error
-    zero-length separator expectedly doesn't work on multi-digit sides, but works for single digit
-    */
     @Tag("api")
-    @Tag("defect")
+    @Tag("blocked")
     @DisplayName("Separator tests")
     @ParameterizedTest(name = "Test separator \"{0}\"")
     @ValueSource(strings = {
             "}", "!", "%", "@", "#", "$", "%", "^", "&", "*", "(", ")", "{",
             "[", "]", "+", "-", "_", "=", "/", "\\", "\n", "\r", "\t", ".",
-            ",", "<", ">", "~", "`", "\"", "\'", "", "ab"
+            ",", "<", ">", "~", "`", "\"", "'", "", "ab"
     })
     void separatorTest(String sep) {
         String reqBody = util.generateRequestBody(10.1, 10.01, 10.001, sep);
@@ -230,13 +212,13 @@ public class APITests extends TestBase {
     }
 
     @Tag("api")
-    @Tag("defect")
+    @Tag("blocked")
     @ParameterizedTest(name = "Invalid sides combinations: {arguments}")
     @DisplayName("Zero length sides, negative sides, sides equal or greater than sum of other two")
     @CsvSource({
-            "0,1,1", "1,0,1", "1,1,0", // zero-length sides are accepted
-            "-3,4,5", "4,-5,6", "5,6,-7", // negative sides are accepted
-            "1,1,2", "1,1,3" // Triangle inequality: equal creates zero-area triangle, greater than correctly results in error
+            "0,1,1", "1,0,1", "1,1,0",
+            "-3,4,5", "4,-5,6", "5,6,-7",
+            "1,1,2", "1,1,3"
     })
     void invalidSidesCombinationTests(double side1, double side2, double side3) {
         String reqBody = util.generateRequestBody(side1, side2, side3, ";");
