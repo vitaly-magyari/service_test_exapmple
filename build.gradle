@@ -21,6 +21,11 @@ test {
         excludeTags 'disabled'
     }
 
+    systemProperties = [
+            'junit.jupiter.execution.parallel.enabled':'false',
+            'junit.jupiter.execution.parallel.mode.default' :'concurrent'
+    ]
+
     testLogging {
         events "passed", "skipped", "failed", "standardOut", "standardError"
     }

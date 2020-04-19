@@ -112,6 +112,7 @@ public class APITests extends TestBase {
                 .log().body();
     }
 
+    @DisplayName("Check if triangles created sequentially are then present in get-all response")
     @Tag("api")
     @Test
     void allTrianglesTest() {
